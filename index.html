@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <style type="text/css">
+    * {
+      margin: 0;
+      padding: 0;
+    }
+    .row {
+      line-height: 0;
+      background-color: pink;
+    }
+    .wall {
+      background-color: blue;
+      height: 40px;
+      width: 40px;
+      display: inline-block;
+    }
+    .sushi {
+      background-color: black;
+      background-image: url('./img/sushi.png');
+      height: 40px;
+      width: 40px;
+      display: inline-block;
+    }
+    .blank {
+      background-color: black;
+      height: 40px;
+      width: 40px;
+      display: inline-block;
+    }
+    #ninjaman {
+      background-color: black;
+      background-image: url('./img/ninja.gif');
+      background-size: contain;
+      position: absolute;
+      height: 40px;
+      width: 40px;
+      display: inline-block;
+      left: 40px;
+      top: 40px;
+    }
+  </style>
+  <title>Ninjaman</title>
+</head>
+<body>
+  <div id="world"></div>
+  <div id ="ninjaman"></div>
+  <script>
+    //////////////
+    //WORLD MAKE//
+    /////////////
+
+    let world = [
+      [1,1,1,1,1,1,1,1,1,1,1],
+      [1,0,2,2,2,2,2,2,2,2,1],
+      [1,2,1,1,2,1,2,2,1,2,1],
+      [1,1,2,1,1,2,2,1,2,2,1],
+      [1,2,2,2,2,2,2,2,2,2,1],
+      [1,2,1,1,1,1,2,2,1,2,1],
+      [1,2,2,2,1,2,2,1,2,2,1],
+      [1,2,2,2,1,2,2,2,2,2,1],
+      [1,2,1,2,1,1,2,2,1,2,1],
+      [1,1,2,2,1,2,2,1,2,2,1],
+      [1,1,1,1,1,1,1,1,1,1,1] 
+    ];
+
+    let worldDict = {
+      0: 'blank',
+      1: 'wall',
+      2: 'sushi',
+      4: 'ninjaman'
+    };
+
+    const drawWorld = () => {
+      let output = '';
+      
+      for (let row = 0; row < world.length; row++) {
+        output += '<div class="row">';
+        for (col = 0; col < world[row].length; col++) {
+          output += `<div class="${worldDict[world[row][col]]}"></div>`;
+        }
+        output += '</div>';
+      }
+      document.getElementById('world').innerHTML = output;
+    }
+
+    drawWorld();
+
+    ///////////////////
+    //Ninjaman Moves//
+    /////////////////
+
+    const ninja = document.getElementById('ninjaman');
+
+    let x = 40;
+    let y = 40;
+    let direction = 'right';
+    let points = 0;
+
+    let ninjaPosition = {
+      x: 1,
+      y: 1 
+    };
+
+    let currentPosition = () => {
+      console.log(ninjaPosition.x, ninjaPosition.y, `\n above me is a ${worldDict[world[ninjaPosition.x-1][ninjaPosition.y]]}, \n below me is a ${worldDict[world[ninjaPosition.x+1][ninjaPosition.y]]}, \n to my left is a ${worldDict[world[ninjaPosition.x][ninjaPosition.y-1]]}, \n to my right is a ${worldDict[world[ninjaPosition.x][ninjaPosition.y+1]]}`);
+    }
+
+    let update = () => {
+      ninja.style.left = `${x}px`;
+      ninja.style.top = `${y}px`;
+      // currentPosition();
+      if(points === 57) {
+        console.log('Ninjaman is full. Congratulations!')
+      }
+    }
+
+    document.onkeydown = e => {
+      if (e.keyCode == 37 && 
+          world[ninjaPosition.x][ninjaPosition.y-1] !== 1
+          ) { //LEFT
+        x-=40;
+        direction = 'left';
+        ninjaPosition.y--;
+
+      } else if (e.keyCode == 39 &&
+          world[ninjaPosition.x][ninjaPosition.y+1] !== 1
+          ) { //RIGHT
+        x+=40;
+        direction = 'right';
+        ninjaPosition.y++
+      } else if (e.keyCode == 40 &&
+          world[ninjaPosition.x+1][ninjaPosition.y] !== 1
+          ) { //DOWN
+        y+=40;
+        ninjaPosition.x++;
+        direction = 'down';
+      } else if (e.keyCode == 38 &&
+          world[ninjaPosition.x-1][ninjaPosition.y] !== 1
+          ) { //UP
+        y-=40;
+        direction = 'up';
+        ninjaPosition.x--;
+      }
+
+      // SUSHI EAT
+      if (world[ninjaPosition.x][ninjaPosition.y] === 2) {//if Left is Sushi
+          //set matrix position to left as 'blank'
+          world[ninjaPosition.x][ninjaPosition.y] = 0;
+          // console.log('yummy sushi');
+          points++;
+          console.log(`Sushi eaten: ${points}`);
+          drawWorld();
+        }
+      update();
+    }
+  </script>
+</body>
+</html>
